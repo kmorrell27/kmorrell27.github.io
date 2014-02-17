@@ -1,3 +1,5 @@
-name: Kevin Morrell's website
+name: Kevin Morrell
+title: Kevin Morrell
 markdown: redcarpet
 pygments: true
+include: [assets]
