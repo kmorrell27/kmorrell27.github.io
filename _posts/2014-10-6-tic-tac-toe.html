@@ -13,6 +13,13 @@ title: Tic-Tac-Toe
       var bestMove;
       var gameStillRunning = true;
 
+      // For Halloween!
+      var spookyMode = false;
+
+      var pumpkinHtml = '<img src="/assets/icon_23676.png" class="icon">';
+
+      var skullHtml = '<img src="/assets/icon_34530.png" class="icon">';
+
       function putX(spaceNum) {
           if (!gameStillRunning) {
               // The game's over. No more moves.
@@ -20,12 +27,16 @@ title: Tic-Tac-Toe
           }
           if (!gameBoard[spaceNum]) {
               var spaceId = document.getElementById("space" + spaceNum);
-              spaceId.innerHTML = 'X';
+              if (!spookyMode) {
+                  spaceId.innerHTML = 'X';
+              } else {
+                  spaceId.innerHTML = skullHtml;
+              }
               gameBoard[spaceNum] = 'X';
               var winner = getWinner(gameBoard);
               if (winner == 'X') {
                   var statusSpan = document.getElementById('gameStatusSpan');
-                  statusSpan.innerHTML = (winner + ' wins!');
+                  statusSpan.innerHTML = 'X wins!';
                   var resetButton = document.getElementById('resetButton');
                   resetButton.className = 'resetButton';
                   gameStillRunning = false;
@@ -80,7 +91,11 @@ title: Tic-Tac-Toe
           minimax(gameBoard, 'O', 0);
           gameBoard[bestMove] = 'O';
           var spaceId = document.getElementById('space' + bestMove);
-          spaceId.innerHTML = 'O';
+          if (!spookyMode) {
+              spaceId.innerHTML = 'O';
+          } else {
+              spaceId.innerHTML = pumpkinHtml;
+          }
           if (getWinner(gameBoard) == 'O') {
               var statusSpan = document.getElementById('gameStatusSpan');
               statusSpan.innerHTML = 'O wins!';
@@ -150,22 +165,42 @@ title: Tic-Tac-Toe
           // And allow the game to be played again
           gameStillRunning = true;
       }
+
+      function spookyToggle() {
+          for (var i = 0; i < 9; i++) {
+              var spaceEl = document.getElementById('space' + i);
+              if (!spookyMode) {
+                  if (spaceEl.innerHTML == 'X') {
+                      spaceEl.innerHTML = skullHtml;
+                  } else if (spaceEl.innerHTML == 'O') {
+                      spaceEl.innerHTML = pumpkinHtml;
+                  }
+              } else {
+                  if (spaceEl.innerHTML.indexOf('icon_34530') > -1) {
+                      spaceEl.innerHTML = 'X';
+                  } else if (spaceEl.innerHTML.indexOf('icon_23676') > -1) {
+                      spaceEl.innerHTML = 'O';
+                  }
+              }
+          }
+          spookyMode = !spookyMode;
+      }
     </script>
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
     <style type="text/css">
       div.board {
-          height: 340px;
-          width: 340px;
+          height: 320px;
+          width: 320px;
           background-color: #888888;
       }
       div.row {
-          height: 120px;
+          height: 110px;
       }
       a.button {
           float: left;
           background-color: white;
           text-decoration: none;
-          margin-right: 20px;
+          margin-right: 10px;
           height: 100px;
           width: 100px;
           font-family:'Open Sans', sans-serif;
@@ -183,13 +218,18 @@ title: Tic-Tac-Toe
           height: 60px;
           margin-top: 20px;
           padding: 0;
-          width: 340px;
+          width: 320px;
       }
       .hidden {
           display:none;
       }
       .resetButton {
           display:block;
+      }
+
+      .icon {
+          height: 80px;
+          width: 80px;
       }
     </style>
   </head>
@@ -216,5 +256,8 @@ title: Tic-Tac-Toe
       <span id="gameStatusSpan"></span>
       <button id="resetButton" onclick="resetGame()" class="hidden">Try again</button>
     </div>
+    <button id="spookyMode" onclick="spookyToggle()">Toggle spooky mode</button>
+    <p>Skull designed by <a href="http://www.thenounproject.com/SuperAtic">SuperAtic LABS</a> from the <a href="http://www.thenounproject.com">Noun Project</a></p>
+    <p>Jack O Lantern designed by <a href="http://www.thenounproject.com/coexsystem">John Leonard</a> from the <a href="http://www.thenounproject.com">Noun Project</a></p>
   </body>
 </html>
