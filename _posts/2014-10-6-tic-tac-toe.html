@@ -11,19 +11,30 @@ title: Tic-Tac-Toe
       var gameBoard = new Array(9);
       // Used by the CPU
       var bestMove;
+      var gameStillRunning = true;
 
       function putX(spaceNum) {
+          if (!gameStillRunning) {
+              // The game's over. No more moves.
+              return;
+          }
           if (!gameBoard[spaceNum]) {
               var spaceId = document.getElementById("space" + spaceNum);
               spaceId.innerHTML = 'X';
               gameBoard[spaceNum] = 'X';
               var winner = getWinner(gameBoard);
               if (winner == 'X') {
-                  var statusDiv = document.getElementById('gameStatusDiv');
-                  statusDiv.innerHTML = (winner + ' wins!');
+                  var statusSpan = document.getElementById('gameStatusSpan');
+                  statusSpan.innerHTML = (winner + ' wins!');
+                  var resetButton = document.getElementById('resetButton');
+                  resetButton.className = 'resetButton';
+                  gameStillRunning = false;
               } else if (winner == 'draw') {
-                  var statusDiv = document.getElementById('gameStatusDiv');
-                  statusDiv.innerHTML = 'Draw!';
+                  var statusSpan = document.getElementById('gameStatusSpan');
+                  statusSpan.innerHTML = 'Draw!';
+                  var resetButton = document.getElementById('resetButton');
+                  resetButton.className = 'resetButton';
+                  gameStillRunning = false;
               } else {
                   // No winner yet, so now it's the computer's turn
                   calculateCircleMove();
@@ -53,13 +64,13 @@ title: Tic-Tac-Toe
               return board[2];
           } else {
               // Now let's check for draws.
-                      for (var i = 0; i < 9; i++) {
-                              if (!board[i]) {
-                                      // There's an empty space. The game is still ongoing.
-                                      return '';
-                              }
+                  for (var i = 0; i < 9; i++) {
+                      if (!board[i]) {
+                          // There's an empty space. The game is still ongoing.
+                          return '';
                       }
-                      // If we made it to the end, the board is full and it's a draw.
+                  }
+              // If we made it to the end, the board is full and it's a draw.
               return 'draw';
           }
       }
@@ -70,9 +81,13 @@ title: Tic-Tac-Toe
           gameBoard[bestMove] = 'O';
           var spaceId = document.getElementById('space' + bestMove);
           spaceId.innerHTML = 'O';
-              if (getWinner(gameBoard) == 'O') {
-                      console.log('O Wins');
-              }
+          if (getWinner(gameBoard) == 'O') {
+              var statusSpan = document.getElementById('gameStatusSpan');
+              statusSpan.innerHTML = 'O wins!';
+              var resetButton = document.getElementById('resetButton');
+              resetButton.className = 'resetButton';
+              gameStillRunning = false;
+          }
       }
 
       function minimax(minimaxBoard, currentPlayer, depth) {
@@ -93,13 +108,15 @@ title: Tic-Tac-Toe
                       var result = minimax(newBoard, 'X', depth + 1);
                       if (result > maxValue) {
                           maxValue = result;
-                                              if (depth == 0) {
-                                                      bestMove = i;
-                                              }
+                          // We're only interested in the best next move, not
+                          // one 6 moves down the line.
+                          if (depth == 0) {
+                              bestMove = i;
+                          }
                       }
                   }
               }
-                      return maxValue;
+              return maxValue;
           } else if (currentPlayer == 'X') {
               var minValue = 100;
               for (var i = 0; i < 9; i++) {
@@ -113,8 +130,25 @@ title: Tic-Tac-Toe
                       }
                   }
               }
-                      return minValue;
+              return minValue;
           }
+      }
+
+      function resetGame() {
+          gameBoard = new Array(9);
+          for (var i = 0; i < 9; i++) {
+              var spaceEl = document.getElementById('space' + i);
+              spaceEl.innerHTML = '';
+          }
+
+          var resetButton = document.getElementById('resetButton');
+          resetButton.className = 'hidden';
+
+          var gameStatusSpan = document.getElementById('gameStatusSpan');
+          gameStatusSpan.innerHTML = '';
+
+          // And allow the game to be played again
+          gameStillRunning = true;
       }
     </script>
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
@@ -138,12 +172,28 @@ title: Tic-Tac-Toe
           font-size: 80px;
           color: black;
           text-align: center;
+          line-height: 1em;
       }
       a.right {
           margin-right: 0;
       }
+      div.statusDiv {
+          background-color: #cccccc;
+          border: 1px solid;
+          height: 60px;
+          margin-top: 20px;
+          padding: 0;
+          width: 340px;
+      }
+      .hidden {
+          display:none;
+      }
+      .resetButton {
+          display:block;
+      }
     </style>
   </head>
+
   <body>
     <div class="board">
       <div class="row">
@@ -161,7 +211,10 @@ title: Tic-Tac-Toe
         <a href="" id="space7" class="button" onclick="putX(7); return false;"></a>
         <a href="" id="space8" class="button right" onclick="putX(8); return false;"></a>
       </div>
-      <div id="gameStatusDiv"></div>
+    </div>
+    <div class="statusDiv">
+      <span id="gameStatusSpan"></span>
+      <button id="resetButton" onclick="resetGame()" class="hidden">Try again</button>
     </div>
   </body>
 </html>
