@@ -91,7 +91,6 @@ title: Tic-Tac-Toe
       }
 
       function calculateCircleMove() {
-          // Copy the current board into a new one that we'll test our possibilities against.
           minimax(gameBoard, 'O', 0);
           gameBoard[bestMove] = 'O';
           var spaceId = document.getElementById('space' + bestMove);
