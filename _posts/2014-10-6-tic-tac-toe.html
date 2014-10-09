@@ -36,15 +36,19 @@ title: Tic-Tac-Toe
               var winner = getWinner(gameBoard);
               if (winner == 'X') {
                   var statusSpan = document.getElementById('gameStatusSpan');
-                  statusSpan.innerHTML = 'X wins!';
+                  if (!spookyMode) {
+                      statusSpan.innerHTML = 'X wins!';
+                  } else {
+                      statusSpan.innerHTML = 'Skull wins!';
+                  }
                   var resetButton = document.getElementById('resetButton');
-                  resetButton.className = 'resetButton';
+                  resetButton.className = 'clouds-flat-button';
                   gameStillRunning = false;
               } else if (winner == 'draw') {
                   var statusSpan = document.getElementById('gameStatusSpan');
                   statusSpan.innerHTML = 'Draw!';
                   var resetButton = document.getElementById('resetButton');
-                  resetButton.className = 'resetButton';
+                  resetButton.className = 'clouds-flat-button';
                   gameStillRunning = false;
               } else {
                   // No winner yet, so now it's the computer's turn
@@ -98,9 +102,13 @@ title: Tic-Tac-Toe
           }
           if (getWinner(gameBoard) == 'O') {
               var statusSpan = document.getElementById('gameStatusSpan');
-              statusSpan.innerHTML = 'O wins!';
+              if (!spookyMode) {
+                  statusSpan.innerHTML = 'O wins!';
+              } else {
+                  statusSpan.innerHTML = 'Pumpkin wins!';
+              }
               var resetButton = document.getElementById('resetButton');
-              resetButton.className = 'resetButton';
+              resetButton.className = 'clouds-flat-button';
               gameStillRunning = false;
           }
       }
@@ -189,18 +197,18 @@ title: Tic-Tac-Toe
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
     <style type="text/css">
       div.board {
-          height: 320px;
-          width: 320px;
+          height: 310px;
+          width: 310px;
           background-color: #888888;
       }
       div.row {
-          height: 110px;
+          height: 105px;
       }
       a.button {
           float: left;
           background-color: white;
           text-decoration: none;
-          margin-right: 10px;
+          margin-right: 5px;
           height: 100px;
           width: 100px;
           font-family:'Open Sans', sans-serif;
@@ -215,26 +223,80 @@ title: Tic-Tac-Toe
       div.statusDiv {
           background-color: #cccccc;
           border: 1px solid;
-          height: 60px;
-          margin-top: 20px;
-          padding: 0;
-          width: 320px;
+          height: 90px;
+          margin: 20px 0;
+          padding: 20px;
+          text-align: center;
+          width: 270px;
       }
       .hidden {
           display:none;
       }
       .resetButton {
           display:block;
+          margin: 0 auto;
+
       }
 
       .icon {
           height: 80px;
           width: 80px;
       }
+
+      /* From http://cssdeck.com/labs/beautiful-flat-buttons */
+      .clouds-flat-button {
+          position: relative;
+          vertical-align: top;
+          width: 100%;
+          height: 60px;
+          padding: 0;
+          font-size: 22px;
+          color:#454545;
+          text-align: center;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+          background: #ecf0f1;
+          border: 0;
+          border-bottom: 2px solid #dadedf;
+          cursor: pointer;
+          -webkit-box-shadow: inset 0 -2px #dadedf;
+          box-shadow: inset 0 -2px #dadedf;
+      }
+
+      .clouds-flat-button:active {
+          top: 1px;
+          outline: none;
+          -webkit-box-shadow: none;
+          box-shadow: none;
+      }
+
+      .pumpkin-flat-button {
+          position: relative;
+          vertical-align: top;
+          width: 310px;
+          height: 60px;
+          padding: 0;
+          font-size: 22px;
+          color: white;
+          text-align: center;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+          background: #d35400;
+          border: 0;
+          border-bottom: 2px solid #c54e00;
+          cursor: pointer;
+          -webkit-box-shadow: inset 0 -2px #c54e00;
+          box-shadow: inset 0 -2px #c54e00;
+      }
+      .pumpkin-flat-button:active {
+          top: 1px;
+          outline: none;
+          -webkit-box-shadow: none;
+          box-shadow: none;
+      }
     </style>
   </head>
 
   <body>
+    <p>Click anywhere to start!</p>
     <div class="board">
       <div class="row">
         <a href="" id="space0" class="button" onclick="putX(0); return false;"></a>
@@ -256,7 +318,7 @@ title: Tic-Tac-Toe
       <span id="gameStatusSpan"></span>
       <button id="resetButton" onclick="resetGame()" class="hidden">Try again</button>
     </div>
-    <button id="spookyMode" onclick="spookyToggle()">Toggle spooky mode</button>
+    <button id="spookyMode" class="pumpkin-flat-button" onclick="spookyToggle()">Toggle spooky mode</button>
     <p>Skull designed by <a href="http://www.thenounproject.com/SuperAtic">SuperAtic LABS</a> from the <a href="http://www.thenounproject.com">Noun Project</a></p>
     <p>Jack O Lantern designed by <a href="http://www.thenounproject.com/coexsystem">John Leonard</a> from the <a href="http://www.thenounproject.com">Noun Project</a></p>
   </body>
