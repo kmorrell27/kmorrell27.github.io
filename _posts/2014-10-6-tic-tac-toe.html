@@ -12,13 +12,16 @@ title: Tic-Tac-Toe
       // Used by the CPU
       var bestMove;
       var gameStillRunning = true;
+      var numberOfMoves = 0;
 
       // For Halloween!
       var spookyMode = false;
 
-      var pumpkinHtml = '<img src="/assets/icon_23676.png" class="icon">';
+      var xInnerHtml = 'X';
+      var oInnerHtml = 'O';
 
-      var skullHtml = '<img src="/assets/icon_34530.png" class="icon">';
+      var xWinString = 'X';
+      var oWinString = 'O';
 
       function putX(spaceNum) {
           if (!gameStillRunning) {
@@ -26,30 +29,13 @@ title: Tic-Tac-Toe
               return;
           }
           if (!gameBoard[spaceNum]) {
-              var spaceId = document.getElementById("space" + spaceNum);
-              if (!spookyMode) {
-                  spaceId.innerHTML = 'X';
-              } else {
-                  spaceId.innerHTML = skullHtml;
-              }
+              numberOfMoves++;
+              var spaceEl = document.getElementById("space" + spaceNum);
+              spaceEl.innerHTML = xInnerHtml;
               gameBoard[spaceNum] = 'X';
-              var winner = getWinner(gameBoard);
-              if (winner == 'X') {
-                  var statusSpan = document.getElementById('gameStatusSpan');
-                  if (!spookyMode) {
-                      statusSpan.innerHTML = 'X wins!';
-                  } else {
-                      statusSpan.innerHTML = 'Skull wins!';
-                  }
-                  var resetButton = document.getElementById('resetButton');
-                  resetButton.className = 'clouds-flat-button';
-                  gameStillRunning = false;
-              } else if (winner == 'draw') {
-                  var statusSpan = document.getElementById('gameStatusSpan');
-                  statusSpan.innerHTML = 'Draw!';
-                  var resetButton = document.getElementById('resetButton');
-                  resetButton.className = 'clouds-flat-button';
-                  gameStillRunning = false;
+              var winner = getWinner(gameBoard, numberOfMoves);
+              if (winner) {
+                  gameOver(winner);
               } else {
                   // No winner yet, so now it's the computer's turn
                   calculateCircleMove();
@@ -57,81 +43,81 @@ title: Tic-Tac-Toe
           }
       }
 
-      function getWinner(board) {
-          // Check for the horizontal win conditions
-          if (board[0] == board[1] && board[1] == board[2]) {
+      function getWinner(board, filledSquares) {
+          for (var i = 0; i < 3; i++) {
+              // Check the horizontal condition, and check that the row
+              // actually has a value and isn't null.
+              if (board[i * 3] &&
+                  board[i * 3] == board[(i * 3) + 1] &&
+                  board[(i * 3) + 1] == board[(i * 3) + 2]) {
+                  return board[i * 3];
+              }
+              // Check the vertical condition, and again make sure that the
+              // column isn't all null.
+              else if (board[i] &&
+                       board[i] == board[i + 3] &&
+                       board[i + 3] == board[i + 6]) {
+                  return board[i];
+              }
+          }
+
+          // The diagonals need to be handled separately.
+          if (board[0] && board[0] == board[4] && board[4] == board[8]) {
               return board[0];
-          } else if (board[3] == board[4] && board[4] == board[5]) {
-              return board[3];
-          } else if (board[6] == board[7] && board[7] == board[8]) {
-              return board[6];
-              // And the vertical ones
-          } else if (board[0] == board[3] && board[3] == board[6]) {
-              return board[0];
-          } else if (board[1] == board[4] && board[4] == board[7]) {
-              return board[1];
-          } else if (board[2] == board[5] && board[5] == board[8]) {
+          } else if (board[2] && board[2] == board[4] && board[4] == board[6]) {
               return board[2];
-              // And the diagonals
-          } else if (board[0] == board[4] && board[4] == board[8]) {
-              return board[0];
-          } else if (board[2] == board[4] && board[4] == board[6]) {
-              return board[2];
-          } else {
-              // Now let's check for draws.
-                  for (var i = 0; i < 9; i++) {
-                      if (!board[i]) {
-                          // There's an empty space. The game is still ongoing.
-                          return '';
-                      }
-                  }
-              // If we made it to the end, the board is full and it's a draw.
+          } else if (filledSquares == 9) {
+              // If all squares are filled, and none of the other win conditions
+              // were met, it's a draw.
               return 'draw';
           }
       }
 
       function calculateCircleMove() {
-          minimax(gameBoard, 'O', 0);
+          negamax(gameBoard, 'O', 0);
           gameBoard[bestMove] = 'O';
-          var spaceId = document.getElementById('space' + bestMove);
-          if (!spookyMode) {
-              spaceId.innerHTML = 'O';
-          } else {
-              spaceId.innerHTML = pumpkinHtml;
-          }
-          if (getWinner(gameBoard) == 'O') {
-              var statusSpan = document.getElementById('gameStatusSpan');
-              if (!spookyMode) {
-                  statusSpan.innerHTML = 'O wins!';
-              } else {
-                  statusSpan.innerHTML = 'Pumpkin wins!';
-              }
-              var resetButton = document.getElementById('resetButton');
-              resetButton.className = 'clouds-flat-button';
-              gameStillRunning = false;
+          var spaceEl = document.getElementById('space' + bestMove);
+          spaceEl.innerHTML = oInnerHtml;
+          numberOfMoves++;
+          if (getWinner(gameBoard, numberOfMoves) == 'O') {
+              gameOver('O');
           }
       }
 
-      function minimax(minimaxBoard, currentPlayer, depth) {
-          var winner = getWinner(minimaxBoard);
+      function negamax(negamaxBoard, currentPlayer, depth) {
+          if (currentPlayer == 'O') {
+              var multiplier = 1;
+              var otherPlayer = 'X';
+          } else {
+              var multiplier = -1;
+              var otherPlayer = 'O';
+          }
+
+          // Pass in the current number of made moves plus the depth we're at.
+          // This way the getWinner function can easily tell if the board is
+          // full.
+          var winner = getWinner(negamaxBoard, numberOfMoves + depth);
           if (winner == 'X') {
-              return -10;
+              return -1 * multiplier;
           } else if (winner == 'O') {
-              return 10;
+              return 1 * multiplier;
           } else if (winner == 'draw') {
               return 0;
-          } else if (currentPlayer == 'O') {
-              var maxValue = -100;
+          } else {
+              var maxValue = -2;
               for (var i = 0; i < 9; i++) {
-                  if (!minimaxBoard[i]) {
+                  if (!negamaxBoard[i]) {
                       // There's a valid move here.
-                      var newBoard = minimaxBoard.slice(0);
-                      newBoard[i] = 'O';
-                      var result = minimax(newBoard, 'X', depth + 1);
+                      var newBoard = negamaxBoard.slice(0);
+                      newBoard[i] = currentPlayer;
+                      var result = -1 * negamax(newBoard, otherPlayer, depth + 1);
                       if (result > maxValue) {
                           maxValue = result;
+
                           // We're only interested in the best next move, not
-                          // one 6 moves down the line.
+                          // one 6 moves down the line. Circle always calls
+                          // this function initially, so I know that any move
+                          // at a depth of zero is for the computer player.
                           if (depth == 0) {
                               bestMove = i;
                           }
@@ -139,20 +125,6 @@ title: Tic-Tac-Toe
                   }
               }
               return maxValue;
-          } else if (currentPlayer == 'X') {
-              var minValue = 100;
-              for (var i = 0; i < 9; i++) {
-                  if (!minimaxBoard[i]) {
-                      // There's a valid move here.
-                      var newBoard = minimaxBoard.slice(0);
-                      newBoard[i] = 'X';
-                      var result = minimax(newBoard, 'O', depth + 1);
-                      if (result < minValue) {
-                          minValue = result;
-                      }
-                  }
-              }
-              return minValue;
           }
       }
 
@@ -171,29 +143,61 @@ title: Tic-Tac-Toe
 
           // And allow the game to be played again
           gameStillRunning = true;
+          numberOfMoves = 0;
       }
 
       function spookyToggle() {
+          if (spookyMode) {
+              // I need to hang on to these old values to search for them in
+              // the board when switching back to normal mode.
+              var oldX = xInnerHtml;
+              var oldO = oInnerHtml;
+              xInnerHtml = 'X';
+              oInnerHtml = 'O';
+              xWinString = 'X';
+              oWinString = 'O';
+
+          } else {
+              // I need to hang on to these old values to search for them in
+              // the board when switching to spooky mode.
+              var oldX = xInnerHtml;
+              var oldO = oInnerHtml;
+              xInnerHtml = '<img src="/assets/icon_34530.png" class="icon">';
+              oInnerHtml = '<img src="/assets/icon_23676.png" class="icon">';
+              xWinString = 'Skull';
+              oWinString = 'Pumpkin';
+          }
+
           for (var i = 0; i < 9; i++) {
               var spaceEl = document.getElementById('space' + i);
-              if (!spookyMode) {
-                  if (spaceEl.innerHTML == 'X') {
-                      spaceEl.innerHTML = skullHtml;
-                  } else if (spaceEl.innerHTML == 'O') {
-                      spaceEl.innerHTML = pumpkinHtml;
-                  }
-              } else {
-                  if (spaceEl.innerHTML.indexOf('icon_34530') > -1) {
-                      spaceEl.innerHTML = 'X';
-                  } else if (spaceEl.innerHTML.indexOf('icon_23676') > -1) {
-                      spaceEl.innerHTML = 'O';
-                  }
+              if (spaceEl.innerHTML == oldX) {
+                  spaceEl.innerHTML = xInnerHtml;
+              } else if (spaceEl.innerHTML == oldO) {
+                  spaceEl.innerHTML = oInnerHtml;
               }
           }
           spookyMode = !spookyMode;
       }
+
+      function gameOver(winner) {
+          var statusSpan = document.getElementById('gameStatusSpan');
+
+          if (winner == 'O') {
+              statusSpan.innerHTML = oWinString + ' wins!';
+          } else if (winner == 'X') {
+              statusSpan.innerHTML = xWinString + ' wins!';
+          } else {
+              statusSpan.innerHTML = 'Draw!';
+          }
+          var resetButton = document.getElementById('resetButton');
+          resetButton.className = 'clouds-flat-button';
+          gameStillRunning = false;
+      }
+
     </script>
+
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+
     <style type="text/css">
       div.board {
           height: 310px;
